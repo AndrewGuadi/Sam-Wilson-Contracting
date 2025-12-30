@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sam and Wilson | Harrisburg Electrician, Plumber, HVAC & Handyman</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Tailwind Config for precise colors if needed, though defaults work well -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            950: '#020617', // Ensure 950 is available
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Import Map for React Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "react": "https://esm.sh/react@18.2.0",
+            "react-dom/client": "https://esm.sh/react-dom@18.2.0/client",
+            "lucide-react": "https://esm.sh/lucide-react@0.263.1"
+        }
+    }
+    </script>
+
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+        
+        /* Smooth Scroll */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        /* Safe area padding for mobile sticky bar */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+</head>
+<body class="font-sans antialiased text-slate-900 bg-white">
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        import React, { useState, useEffect } from 'react';
+        import { createRoot } from 'react-dom/client';
+        import { 
+          Phone, 
+          MapPin, 
+          Clock, 
+          Menu, 
+          X, 
+          Zap, 
+          Wrench, 
+          Thermometer, 
+          Hammer, 
+          CheckCircle, 
+          Star, 
+          ArrowRight, 
+          Mail,
+          ChevronRight,
+          ShieldCheck,
+          Home,
+          Droplets,
+          PaintBucket,
+          AlertTriangle,
+          Calendar,
+          ThumbsUp,
+          Award,
+          PenTool
+        } from 'lucide-react';
+
+        /**
+         * Sam and Wilson - Complete Website Rebuild (v2: Enhanced & Expanded)
+         */
+
+        // --- Types & Interfaces ---
+        // (Types are stripped in JS runtime, but kept for clarity if using TS-aware Babel)
+
+        // --- Data ---
+
+        const COMPANY_PHONE = "(717) 736-3987";
+        const COMPANY_EMAIL = "samandwilsonco@gmail.com";
+
+        const SERVICES = [
+          { 
+            id: 'service-electrical', 
+            title: 'Electrical', 
+            icon: Zap, 
+            shortDesc: 'Panel upgrades, lighting, and repairs.',
+            longDesc: 'From flickering lights to full 200-amp panel upgrades, our licensed electricians ensure your home is safe and code-compliant.'
+          },
+          { 
+            id: 'service-plumbing', 
+            title: 'Plumbing', 
+            icon: Droplets, 
+            shortDesc: 'Leaks, heaters, and pipe installation.',
+            longDesc: 'We handle everything from emergency leak repairs to water heater installations. Fast, clean, and reliable.'
+          },
+          { 
+            id: 'service-hvac', 
+            title: 'HVAC & AC', 
+            icon: Thermometer, 
+            shortDesc: 'Heating and cooling repairs & maintenance.',
+            longDesc: 'Keep your home comfortable year-round. We service all major brands of furnaces, boilers, and air conditioning units.'
+          },
+          { 
+            id: 'service-remodeling', 
+            title: 'Remodeling', 
+            icon: Hammer, 
+            shortDesc: 'Kitchens, baths, basements & flooring.',
+            longDesc: 'Transform your living space. We manage the entire project from demo to the final coat of paint.'
+          },
+        ];
+
+        const REVIEWS = [
+          { name: "Sarah J.", loc: "Harrisburg", text: "Sam came out same-day when our breaker kept tripping. Fixed it in an hour and charged way less than the big guys." },
+          { name: "Mike T.", loc: "Mechanicsburg", text: "They remodeled our master bath and it looks like a hotel. The tile work is perfect." },
+          { name: "Linda B.", loc: "Hershey", text: "Finally a contractor who calls back! Wilson walked me through the whole HVAC repair." }
+        ];
+
+        // --- Components ---
+
+        const Navigation = ({ activePage, setPage, isMenuOpen, setIsMenuOpen }) => {
+          const navItems = [
+            { label: 'Home', page: 'home' },
+            { label: 'Electrical', page: 'service-electrical' },
+            { label: 'Plumbing', page: 'service-plumbing' },
+            { label: 'HVAC', page: 'service-hvac' },
+            { label: 'Remodeling', page: 'service-remodeling' },
+            { label: 'Contact', page: 'contact' },
+          ];
+
+          return (
+            <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur-md shadow-lg border-b border-slate-200/50">
+              {/* Top Bar (Desktop) */}
+              <div className="hidden md:flex justify-between items-center bg-slate-950 text-white px-6 py-2.5 text-xs font-medium tracking-wide">
+                <div className="flex gap-6">
+                  <span className="flex items-center gap-2"><MapPin size={14} className="text-orange-500" /> Serving Harrisburg & Central PA</span>
+                  <span className="flex items-center gap-2"><Clock size={14} className="text-orange-500" /> Mon-Sat: 8am - 6pm</span>
+                </div>
+                <div className="flex gap-6 font-bold">
+                  <a href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} className="flex items-center gap-2 hover:text-orange-400 transition-colors">
+                    <Phone size={14} /> {COMPANY_PHONE}
+                  </a>
+                </div>
+              </div>
+
+              {/* Main Nav */}
+              <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div 
+                  className="flex items-center gap-3 cursor-pointer group" 
+                  onClick={() => setPage('home')}
+                >
+                  {/* Logo Placeholder */}
+                  <div className="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white font-bold text-xl border-2 border-orange-500 shadow-orange-500/20 shadow-lg group-hover:scale-105 transition-transform">
+                    SW
+                  </div>
+                  <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-slate-900 leading-none tracking-tight">Sam & Wilson</h1>
+                    <p className="text-[10px] text-slate-500 font-bold tracking-[0.2em] uppercase mt-1">Electrical & Construction</p>
+                  </div>
+                </div>
+
+                {/* Desktop Links */}
+                <div className="hidden lg:flex items-center gap-8 font-semibold text-slate-600 text-sm">
+                  {navItems.map((item) => (
+                    <button 
+                      key={item.page}
+                      onClick={() => setPage(item.page)}
+                      className={`hover:text-blue-900 transition-all hover:-translate-y-0.5 ${activePage === item.page ? 'text-blue-900 font-bold border-b-2 border-orange-500' : ''}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  <button 
+                    onClick={() => setPage('contact')}
+                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-full font-bold transition-all shadow-lg shadow-orange-500/30 hover:shadow-orange-500/50 transform hover:-translate-y-0.5 flex items-center gap-2"
+                  >
+                    Get Quote <ArrowRight size={16} />
+                  </button>
+                </div>
+
+                {/* Mobile Menu Toggle */}
+                <button 
+                  className="lg:hidden text-slate-800 p-2 hover:bg-slate-100 rounded-lg transition-colors"
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                >
+                  {isMenuOpen ? <X size={28} /> : <Menu size={28} />}
+                </button>
+              </div>
+
+              {/* Mobile Menu Dropdown */}
+              {isMenuOpen && (
+                <div className="lg:hidden absolute top-full left-0 w-full bg-white shadow-2xl border-t border-slate-100 flex flex-col p-4 gap-2 animate-in slide-in-from-top-2">
+                  {navItems.map((item) => (
+                    <button 
+                      key={item.page}
+                      onClick={() => { setPage(item.page); setIsMenuOpen(false); }}
+                      className={`text-left text-lg py-3 px-4 rounded-lg hover:bg-slate-50 ${activePage === item.page ? 'bg-blue-50 text-blue-900 font-bold' : 'text-slate-700'}`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                  <button 
+                    onClick={() => { setPage('contact'); setIsMenuOpen(false); }}
+                    className="bg-blue-900 text-white py-4 rounded-xl font-bold text-center mt-4 shadow-xl"
+                  >
+                    Get a Free Estimate
+                  </button>
+                </div>
+              )}
+            </nav>
+          );
+        };
+
+        const Footer = ({ setPage }) => (
+          <footer className="bg-slate-950 text-slate-300 pt-20 pb-10 border-t-4 border-orange-500">
+            <div className="container mx-auto px-4 grid md:grid-cols-4 gap-12 mb-16">
+              <div className="space-y-6">
+                <div className="flex items-center gap-3 text-white">
+                  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center font-bold shadow-lg shadow-orange-500/20">SW</div>
+                  <span className="text-2xl font-bold tracking-tight">Sam & Wilson</span>
+                </div>
+                <p className="text-sm leading-relaxed text-slate-400">
+                  The most trusted name in Harrisburg for Electrical, Plumbing, and Remodeling. We don't cut corners, and we stand behind every job.
+                </p>
+                <div className="flex gap-4 pt-2">
+                  <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center hover:bg-orange-500 cursor-pointer transition-all hover:scale-110 text-white"><Star size={16} /></div>
+                  <div className="w-10 h-10 bg-slate-900 rounded-full flex items-center justify-center hover:bg-blue-600 cursor-pointer transition-all hover:scale-110 text-white"><ShieldCheck size={16} /></div>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                  <Wrench size={16} className="text-orange-500" /> Services
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  {SERVICES.map(s => (
+                    <li key={s.id}>
+                      <button onClick={() => setPage(s.id)} className="hover:text-orange-400 transition-colors text-left flex items-center gap-2 group">
+                        <ChevronRight size={14} className="text-slate-600 group-hover:text-orange-500" />
+                        {s.title}
+                      </button>
+                    </li>
+                  ))}
+                  <li><button onClick={() => setPage('gallery')} className="hover:text-orange-400 transition-colors text-left flex items-center gap-2 group"><ChevronRight size={14} className="text-slate-600 group-hover:text-orange-500" /> Project Gallery</button></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                  <MapPin size={16} className="text-orange-500" /> Service Areas
+                </h3>
+                <ul className="space-y-3 text-sm">
+                  <li><button onClick={() => setPage('loc-harrisburg')} className="hover:text-orange-400 transition-colors text-left">Harrisburg, PA</button></li>
+                  <li><button onClick={() => setPage('loc-mechanicsburg')} className="hover:text-orange-400 transition-colors text-left">Mechanicsburg, PA</button></li>
+                  <li><button onClick={() => setPage('loc-hershey')} className="hover:text-orange-400 transition-colors text-left">Hershey & Hummelstown</button></li>
+                  <li><span className="text-slate-500 cursor-default">Carlisle (Coming Soon)</span></li>
+                  <li><span className="text-slate-500 cursor-default">Camp Hill & Enola</span></li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="text-white font-bold mb-6 uppercase tracking-wider text-sm flex items-center gap-2">
+                  <Phone size={16} className="text-orange-500" /> Contact Us
+                </h3>
+                <ul className="space-y-4 text-sm">
+                  <li className="flex items-start gap-4">
+                    <div className="bg-slate-900 p-2 rounded text-orange-500"><MapPin size={18} /></div>
+                    <span className="mt-1">2272 Forest Hills Dr,<br/>Harrisburg PA 17112</span>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="bg-slate-900 p-2 rounded text-orange-500"><Phone size={18} /></div>
+                    <a href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} className="hover:text-white font-bold text-lg">{COMPANY_PHONE}</a>
+                  </li>
+                  <li className="flex items-center gap-4">
+                    <div className="bg-slate-900 p-2 rounded text-orange-500"><Mail size={18} /></div>
+                    <a href={`mailto:${COMPANY_EMAIL}`} className="hover:text-white break-all">{COMPANY_EMAIL}</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+            <div className="container mx-auto px-4 pt-8 border-t border-slate-900 text-center text-xs text-slate-600 flex flex-col md:flex-row justify-between items-center gap-4">
+              <p>&copy; {new Date().getFullYear()} Sam and Wilson Electrical and Construction. All rights reserved.</p>
+              <p>Licensed & Insured in Pennsylvania</p>
+            </div>
+          </footer>
+        );
+
+        const StickyMobileCTA = () => (
+          <div className="md:hidden fixed bottom-0 left-0 w-full bg-white/95 backdrop-blur-lg shadow-[0_-4px_20px_-5px_rgba(0,0,0,0.2)] z-50 flex border-t border-slate-200 p-2 gap-2 pb-safe">
+            <a 
+              href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} 
+              className="flex-1 bg-blue-900 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg shadow-blue-900/20"
+            >
+              <Phone size={18} /> Call Now
+            </a>
+            <button 
+              className="flex-1 bg-orange-500 text-white py-3 rounded-lg font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-lg shadow-orange-500/20"
+            >
+              <Mail size={18} /> Quote
+            </button>
+          </div>
+        );
+
+        // --- Content Components ---
+
+        const WarningSigns = ({ title, signs }) => (
+          <div className="bg-orange-50 border border-orange-100 rounded-2xl p-8 my-12">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="bg-orange-100 p-3 rounded-full text-orange-600">
+                <AlertTriangle size={24} />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900">Warning Signs You Need a {title} Pro</h3>
+            </div>
+            <div className="grid md:grid-cols-2 gap-4">
+              {signs.map((sign, i) => (
+                <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-orange-100/50">
+                  <div className="w-2 h-2 rounded-full bg-orange-500 shrink-0" />
+                  <span className="text-slate-700 font-medium">{sign}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 p-4 bg-orange-100/50 rounded-lg text-orange-800 text-sm font-medium flex gap-2">
+              <AlertTriangle size={16} className="shrink-0 mt-0.5" />
+              <p>If you notice any of these issues, don't wait. Small problems can turn into expensive emergencies quickly.</p>
+            </div>
+          </div>
+        );
+
+        const ProcessSteps = ({ steps }) => (
+          <div className="py-12">
+            <h3 className="text-2xl font-bold text-slate-900 mb-8 text-center">How We Work</h3>
+            <div className="grid md:grid-cols-3 gap-8">
+              {steps.map((step, i) => (
+                <div key={i} className="relative">
+                  <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 h-full relative z-10">
+                    <div className="w-10 h-10 bg-blue-900 text-white rounded-full flex items-center justify-center font-bold text-lg mb-4 shadow-md">
+                      {i + 1}
+                    </div>
+                    <h4 className="font-bold text-lg text-slate-900 mb-2">{step.title}</h4>
+                    <p className="text-slate-600 text-sm">{step.desc}</p>
+                  </div>
+                  {i !== steps.length - 1 && (
+                    <div className="hidden md:block absolute top-1/2 -right-4 w-8 h-0.5 bg-slate-200 z-0" />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+
+        // --- Page Components ---
+
+        const HomePage = ({ setPage }) => {
+          return (
+            <div className="animate-in fade-in duration-500">
+              {/* Hero Section - Edged Up */}
+              <section className="relative bg-slate-950 text-white py-24 lg:py-36 overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
+                <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/95 to-slate-900/80"></div>
+                
+                <div className="container mx-auto px-4 relative z-10 grid lg:grid-cols-2 gap-16 items-center">
+                  <div className="space-y-8">
+                    <div className="inline-flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-full px-4 py-1.5 text-sm font-medium text-blue-200 backdrop-blur-sm">
+                      <Star size={14} className="text-orange-400 fill-orange-400" />
+                      <span>30+ Years Serving Central PA</span>
+                    </div>
+                    <h1 className="text-5xl lg:text-7xl font-extrabold leading-[1.1] tracking-tight">
+                      Honest Work. <br/>
+                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-200">
+                        Fair Prices.
+                      </span>
+                    </h1>
+                    <p className="text-xl text-slate-300 max-w-lg leading-relaxed font-light">
+                      Harrisburg's most trusted <strong>Electricians & Handymen</strong>. We fix it right the first time, from breaker panels to bathroom remodels.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                      <button 
+                        onClick={() => setPage('contact')}
+                        className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-orange-500/20 hover:shadow-orange-500/40 transition-all transform hover:-translate-y-1 flex items-center justify-center gap-2"
+                      >
+                        Get Free Estimate <ArrowRight size={20} />
+                      </button>
+                      <a 
+                        href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`}
+                        className="bg-white/5 hover:bg-white/10 border border-white/10 text-white px-8 py-4 rounded-xl font-bold text-lg backdrop-blur-md transition-all flex items-center justify-center gap-2"
+                      >
+                        <Phone size={20} /> Call Now
+                      </a>
+                    </div>
+                    <div className="pt-8 flex items-center gap-8 text-sm font-medium text-slate-400 border-t border-slate-800/50">
+                      <div className="flex items-center gap-2">
+                        <ShieldCheck size={20} className="text-green-500" /> Licensed & Insured
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock size={20} className="text-blue-400" /> Fast Response
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Enhanced Hero Visual */}
+                  <div className="relative hidden lg:block perspective-1000">
+                    <div className="absolute inset-0 bg-orange-500 rounded-3xl transform rotate-6 opacity-10 blur-2xl"></div>
+                    <div className="relative bg-slate-900 rounded-3xl p-4 shadow-2xl border border-slate-800 transform rotate-1 hover:rotate-0 transition-all duration-700">
+                       <div className="grid grid-cols-2 gap-3 h-[450px]">
+                          <div className="col-span-2 h-48 bg-slate-800 rounded-xl overflow-hidden relative group">
+                            <img src="https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&q=80&w=800" className="object-cover w-full h-full opacity-70 group-hover:opacity-100 transition-opacity duration-500 scale-100 group-hover:scale-105" alt="Electrical Panel" />
+                            <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-lg text-white text-sm font-bold border border-white/10">Electrical Services</div>
+                          </div>
+                          <div className="h-full bg-slate-800 rounded-xl overflow-hidden relative group">
+                            <img src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?auto=format&fit=crop&q=80&w=400" className="object-cover w-full h-full opacity-70 group-hover:opacity-100 transition-opacity duration-500" alt="Plumbing" />
+                             <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-lg text-white text-sm font-bold border border-white/10">Plumbing</div>
+                          </div>
+                          <div className="h-full bg-slate-800 rounded-xl overflow-hidden relative group">
+                            <img src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=400" className="object-cover w-full h-full opacity-70 group-hover:opacity-100 transition-opacity duration-500" alt="Remodeling" />
+                             <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-lg text-white text-sm font-bold border border-white/10">Remodeling</div>
+                          </div>
+                       </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Trust Grid (New Section) */}
+              <section className="py-12 bg-white border-b border-slate-100">
+                <div className="container mx-auto px-4">
+                  <div className="grid md:grid-cols-3 gap-8">
+                    <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="bg-blue-100 p-3 rounded-full text-blue-900"><ShieldCheck size={24} /></div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-lg">Fully Licensed</h3>
+                        <p className="text-slate-600 text-sm">We are compliant with all PA state codes and regulations. Don't risk your home with amateurs.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="bg-orange-100 p-3 rounded-full text-orange-600"><ThumbsUp size={24} /></div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-lg">Satisfaction Guaranteed</h3>
+                        <p className="text-slate-600 text-sm">We don't consider the job done until you are happy. Our reputation means everything to us.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4 p-4 rounded-xl hover:bg-slate-50 transition-colors">
+                      <div className="bg-green-100 p-3 rounded-full text-green-600"><Award size={24} /></div>
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-lg">Transparent Pricing</h3>
+                        <p className="text-slate-600 text-sm">No hidden fees. No surprise bills. You'll know exactly what it costs before we start.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Services Grid */}
+              <section className="py-24 bg-slate-50">
+                <div className="container mx-auto px-4">
+                  <div className="text-center max-w-3xl mx-auto mb-16">
+                    <span className="text-orange-600 font-bold uppercase tracking-wider text-sm mb-2 block">Our Expertise</span>
+                    <h2 className="text-4xl font-extrabold text-slate-900 mb-4">We Do It All. We Do It Right.</h2>
+                    <p className="text-slate-600 text-lg">Don't juggle five different contractors. Sam & Wilson is your single point of contact for total home care.</p>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {SERVICES.map((service) => (
+                      <div 
+                        key={service.id} 
+                        onClick={() => setPage(service.id)}
+                        className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-2xl transition-all border border-slate-100 cursor-pointer group hover:-translate-y-2 relative overflow-hidden"
+                      >
+                        <div className="absolute top-0 right-0 w-24 h-24 bg-slate-50 rounded-bl-full -mr-12 -mt-12 group-hover:bg-blue-50 transition-colors"></div>
+                        
+                        <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-900 mb-6 group-hover:bg-blue-900 group-hover:text-white transition-colors relative z-10 shadow-sm">
+                          <service.icon size={32} />
+                        </div>
+                        
+                        <h3 className="text-2xl font-bold text-slate-900 mb-3 group-hover:text-blue-900 transition-colors">{service.title}</h3>
+                        <p className="text-slate-600 mb-6 text-sm leading-relaxed">{service.shortDesc}</p>
+                        
+                        <span className="text-orange-600 font-bold flex items-center gap-2 group-hover:gap-4 transition-all text-sm">
+                          Full Details <ArrowRight size={16} />
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Expanded Secondary Services */}
+                  <div className="mt-16 bg-white border border-slate-200 rounded-2xl p-8 lg:p-10 shadow-lg relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-1 h-full bg-orange-500"></div>
+                    <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+                      <div>
+                         <h4 className="text-2xl font-bold text-slate-900 mb-2 flex items-center gap-3">
+                          <PaintBucket size={24} className="text-orange-500" /> 
+                          More Than Just The Basics
+                        </h4>
+                        <p className="text-slate-600 max-w-xl">We handle the jobs other contractors are "too busy" for. If it's broken, we can probably fix it.</p>
+                      </div>
+                      <div className="flex flex-wrap gap-3">
+                        {['Interior Painting', 'Drywall Patching', 'Deck Repair', 'Gutter Cleaning', 'Fixture Swaps', 'Door Installation', 'Fence Repair'].map((tag) => (
+                          <span key={tag} className="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg font-medium text-sm hover:bg-slate-200 cursor-default">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* Reviews Carousel (New Section) */}
+              <section className="py-20 bg-blue-900 text-white relative overflow-hidden">
+                <div className="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                  <div className="text-center mb-12">
+                    <h2 className="text-3xl font-bold mb-4">Trusted by Your Neighbors</h2>
+                    <div className="flex justify-center gap-1 text-orange-400">
+                      {[1,2,3,4,5].map(i => <Star key={i} fill="currentColor" size={24} />)}
+                    </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-3 gap-8">
+                    {REVIEWS.map((review, i) => (
+                      <div key={i} className="bg-blue-800/50 backdrop-blur-sm p-8 rounded-2xl border border-blue-700/50 hover:bg-blue-800 transition-colors">
+                        <div className="mb-4 text-orange-400"><Star size={20} fill="currentColor" /></div>
+                        <p className="text-lg italic mb-6 text-blue-100">"{review.text}"</p>
+                        <div>
+                          <p className="font-bold text-white">{review.name}</p>
+                          <p className="text-sm text-blue-300">{review.loc}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+
+              {/* Service Area Map / Local Trust */}
+              <section className="py-24 bg-white">
+                <div className="container mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+                  <div>
+                    <span className="text-orange-500 font-bold uppercase tracking-wider text-sm mb-2 block">Local & Reliable</span>
+                    <h2 className="text-4xl lg:text-5xl font-extrabold text-slate-900 mb-6">Serving Central PA for 30+ Years</h2>
+                    <p className="text-slate-600 mb-8 leading-relaxed text-lg">
+                      We aren't a national franchise with a call center in another state. We live here, shop here, and work here. From the West Shore to Hershey, we've built our reputation on showing up on time and doing the job for the price we quoted.
+                    </p>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4 mb-8">
+                       <button 
+                          onClick={() => setPage('loc-harrisburg')}
+                          className="p-4 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all group text-left"
+                        >
+                          <span className="font-bold text-slate-900 flex items-center gap-2 mb-1">
+                            <MapPin size={18} className="text-orange-500" /> Harrisburg
+                          </span>
+                          <span className="text-xs text-slate-500 block pl-7">17112, 17110, 17111...</span>
+                        </button>
+                        <button 
+                          onClick={() => setPage('loc-mechanicsburg')}
+                          className="p-4 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all group text-left"
+                        >
+                          <span className="font-bold text-slate-900 flex items-center gap-2 mb-1">
+                            <MapPin size={18} className="text-orange-500" /> Mechanicsburg
+                          </span>
+                          <span className="text-xs text-slate-500 block pl-7">West Shore Services</span>
+                        </button>
+                        <button 
+                          onClick={() => setPage('loc-hershey')}
+                          className="p-4 rounded-xl bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all group text-left"
+                        >
+                          <span className="font-bold text-slate-900 flex items-center gap-2 mb-1">
+                            <MapPin size={18} className="text-orange-500" /> Hershey
+                          </span>
+                          <span className="text-xs text-slate-500 block pl-7">Hummelstown & Palmyra</span>
+                        </button>
+                    </div>
+                  </div>
+                  
+                  <div className="relative h-[500px] bg-slate-100 rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                     {/* Enhanced Abstract Map */}
+                     <div className="absolute inset-0 bg-slate-200 opacity-50"></div>
+                     {/* Map Pins Animation */}
+                     <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="relative">
+                          <div className="w-64 h-64 border-4 border-blue-500/20 rounded-full animate-ping absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                          <div className="w-48 h-48 border-4 border-blue-500/40 rounded-full animate-pulse absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"></div>
+                          <MapPin size={64} className="text-blue-900 relative z-10 drop-shadow-xl" fill="currentColor" />
+                        </div>
+                     </div>
+                     
+                     {/* Floating Location Cards */}
+                     <div className="absolute top-12 left-12 bg-white p-3 rounded-lg shadow-lg text-xs font-bold text-slate-700 flex items-center gap-2 animate-bounce duration-[3000ms]">
+                       <div className="w-2 h-2 bg-green-500 rounded-full"></div> Mechanicsburg
+                     </div>
+                     <div className="absolute bottom-24 right-12 bg-white p-3 rounded-lg shadow-lg text-xs font-bold text-slate-700 flex items-center gap-2 animate-bounce duration-[4000ms]">
+                       <div className="w-2 h-2 bg-green-500 rounded-full"></div> Hershey
+                     </div>
+                     
+                     <div className="absolute bottom-0 left-0 w-full bg-white/90 backdrop-blur p-6">
+                       <p className="font-bold text-slate-900">Coverage Area</p>
+                       <p className="text-xs text-slate-500">We typically service within a 20-mile radius of Linglestown, PA.</p>
+                     </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* CTA Strip */}
+              <section className="py-20 bg-slate-950 text-white text-center relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-orange-500 to-blue-500"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                  <h2 className="text-4xl font-bold mb-6">Got a project in mind?</h2>
+                  <p className="text-slate-300 mb-10 max-w-2xl mx-auto text-lg">
+                    Whether it's a flickering light or a full basement remodel, advice is always free. We'll give you a straight answer and a fair price.
+                  </p>
+                  <div className="flex flex-col sm:flex-row justify-center gap-6">
+                    <button 
+                      onClick={() => setPage('contact')}
+                      className="bg-orange-500 hover:bg-orange-600 text-white px-10 py-4 rounded-full font-bold shadow-2xl shadow-orange-500/30 transition-transform hover:scale-105 text-lg"
+                    >
+                      Get a Free Estimate
+                    </button>
+                    <a 
+                      href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`}
+                      className="bg-white text-slate-900 hover:bg-blue-50 px-10 py-4 rounded-full font-bold shadow-2xl transition-transform hover:scale-105 flex items-center justify-center gap-3 text-lg"
+                    >
+                      <Phone size={20} /> Call {COMPANY_PHONE}
+                    </a>
+                  </div>
+                </div>
+              </section>
+            </div>
+          );
+        };
+
+        const ServicePage = ({ title, icon: Icon, desc, features, image }) => {
+          
+          // Specific content based on service type (The "Double Content" Logic)
+          let warningSigns = [];
+          let processSteps = [];
+
+          if (title === "Electrical") {
+            warningSigns = ["Flickering or dimming lights", "Outlets that feel warm to the touch", "Breakers that trip frequently", "Burning smell near panel", "Two-prong ungrounded outlets"];
+            processSteps = [
+              { title: "Safety Inspection", desc: "We start by testing your current load and checking for code violations." },
+              { title: "Clear Pricing", desc: "We explain the issue and give you a flat rate price before we touch a tool." },
+              { title: "The Fix", desc: "We complete the work using commercial-grade components." }
+            ];
+          } else if (title === "Plumbing") {
+            warningSigns = ["Low water pressure", "Slow draining sinks", "Gurgling noises in toilets", "Unexplained spikes in water bill", "Damp spots on drywall"];
+            processSteps = [
+              { title: "Leak Detection", desc: "We identify the source of the leak, even if it's behind a wall." },
+              { title: "Repair Plan", desc: "We explain whether a repair or replacement is the better long-term value." },
+              { title: "Cleanup", desc: "We treat your home with respect and clean the area after work." }
+            ];
+          } else {
+            // Default/Generic
+            warningSigns = ["System making strange noises", "Energy bills increasing", "Inconsistent performance", "Visible wear and tear"];
+            processSteps = [
+              { title: "Consultation", desc: "We listen to your needs and assess the current situation." },
+              { title: "Proposal", desc: "We provide a detailed estimate with no hidden fees." },
+              { title: "Execution", desc: "We get the job done efficiently and correctly." }
+            ];
+          }
+
+          return (
+            <div className="animate-in slide-in-from-right-4 duration-500">
+              <div className="bg-slate-950 text-white py-24 relative overflow-hidden">
+                <div className="absolute -right-20 -top-20 bg-blue-900/20 w-96 h-96 rounded-full blur-3xl"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                  <div className="flex items-center gap-3 mb-6 text-orange-500 font-bold uppercase tracking-wider text-sm">
+                    <span className="bg-orange-500/10 px-4 py-1.5 rounded-full flex items-center gap-2 border border-orange-500/20"><Wrench size={14} /> Services</span>
+                  </div>
+                  <h1 className="text-5xl lg:text-7xl font-bold mb-8 flex flex-col md:flex-row md:items-center gap-6">
+                    <div className="bg-slate-800 p-4 rounded-2xl w-fit shadow-2xl border border-slate-700"><Icon size={48} className="text-orange-500" /></div>
+                    {title} Services
+                  </h1>
+                  <p className="text-xl text-slate-300 max-w-3xl leading-relaxed border-l-4 border-orange-500 pl-6">{desc}</p>
+                </div>
+              </div>
+
+              <div className="container mx-auto px-4 py-20 grid lg:grid-cols-3 gap-16">
+                <div className="lg:col-span-2">
+                  <img src={image} alt={title} className="w-full h-96 object-cover rounded-3xl shadow-2xl mb-12" />
+                  
+                  <div className="prose prose-slate max-w-none">
+                    <h2 className="text-3xl font-bold text-slate-900 mb-6">Professional {title} Services in Harrisburg</h2>
+                    <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                      At Sam & Wilson, we understand that {title.toLowerCase()} issues can be stressful. That's why we prioritize safety, code compliance, and durability in every job we do. Whether it's a small repair or a major installation, we bring the same level of attention to detail.
+                    </p>
+
+                    <h3 className="text-xl font-bold text-slate-900 mb-4">What We Handle</h3>
+                    <div className="grid md:grid-cols-2 gap-4 mb-12">
+                      {features.map((feature, i) => (
+                        <div key={i} className="flex items-start gap-3 p-4 bg-slate-50 rounded-xl border border-slate-100 hover:border-blue-200 transition-colors">
+                          <CheckCircle size={20} className="text-green-500 mt-0.5 shrink-0" />
+                          <span className="font-bold text-slate-800">{feature}</span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    <WarningSigns title={title} signs={warningSigns} />
+                    
+                    <ProcessSteps steps={processSteps} />
+
+                    <div className="bg-blue-900 text-white p-8 rounded-2xl shadow-xl mt-12">
+                      <div className="flex items-start gap-4">
+                         <ShieldCheck size={32} className="text-orange-400 shrink-0" />
+                         <div>
+                           <h3 className="font-bold text-xl mb-2">Our {title} Guarantee</h3>
+                           <p className="text-blue-100">
+                             We don't cut corners. All our {title.toLowerCase()} work is backed by our satisfaction guarantee. We pull the permits, do the work right, and clean up before we leave.
+                           </p>
+                         </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-8">
+                  <div className="bg-white p-8 rounded-3xl shadow-xl border border-slate-100 sticky top-28">
+                    <h3 className="text-2xl font-bold text-slate-900 mb-2">Need a Quote?</h3>
+                    <p className="text-slate-500 mb-8">Tell us about your project and we'll get back to you with a free estimate.</p>
+                    
+                    <a href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} className="w-full bg-blue-900 text-white text-center py-4 rounded-xl font-bold hover:bg-blue-800 transition-colors mb-4 flex items-center justify-center gap-3 shadow-lg shadow-blue-900/20 group">
+                      <Phone size={20} className="group-hover:rotate-12 transition-transform" /> {COMPANY_PHONE}
+                    </a>
+                    
+                    <button className="w-full bg-white border-2 border-orange-500 text-orange-600 text-center py-4 rounded-xl font-bold hover:bg-orange-50 transition-colors flex items-center justify-center gap-2">
+                      <Mail size={20} /> Request Online
+                    </button>
+
+                    <div className="mt-8 pt-8 border-t border-slate-100">
+                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 text-center">We Accept</p>
+                      <div className="flex justify-center gap-4 opacity-50 grayscale">
+                         {/* Placeholders for cards */}
+                         <div className="w-10 h-6 bg-slate-300 rounded"></div>
+                         <div className="w-10 h-6 bg-slate-300 rounded"></div>
+                         <div className="w-10 h-6 bg-slate-300 rounded"></div>
+                         <div className="w-10 h-6 bg-slate-300 rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+                    <h4 className="font-bold text-slate-900 mb-4 flex items-center gap-2"><Star size={16} className="text-orange-500" /> Pro Tip</h4>
+                    <p className="text-sm text-slate-600 italic">
+                      "Never ignore a burning smell near an outlet or panel. Turn off the main breaker and call a pro immediately."
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        const LocationPage = ({ city, subtext }) => (
+          <div className="animate-in slide-in-from-right-4 duration-500">
+            <div className="bg-slate-950 text-white py-24 text-center relative overflow-hidden">
+               {/* Background Map Effect */}
+               <div className="absolute inset-0 opacity-20 bg-[url('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b3/Map_of_Pennsylvania_highlighting_Dauphin_County.svg/1200px-Map_of_Pennsylvania_highlighting_Dauphin_County.svg.png')] bg-center bg-no-repeat bg-contain blur-sm"></div>
+              
+              <div className="container mx-auto px-4 relative z-10">
+                <div className="inline-flex items-center gap-2 bg-orange-500 px-4 py-1.5 rounded-full text-white font-bold text-sm mb-8 shadow-lg shadow-orange-500/20">
+                  <MapPin size={14} /> Service Area
+                </div>
+                <h1 className="text-5xl lg:text-7xl font-extrabold mb-6">Electrician in <br/> <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-amber-200">{city}, PA</span></h1>
+                <p className="text-2xl text-slate-300 max-w-2xl mx-auto font-light">{subtext}</p>
+              </div>
+            </div>
+
+            <div className="container mx-auto px-4 py-20">
+              <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+                <div className="p-10 md:p-16">
+                  <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
+                     <div>
+                        <h2 className="text-3xl font-bold text-slate-900 mb-6">The Local Choice for {city} Homeowners</h2>
+                        <p className="text-slate-600 mb-6 text-lg leading-relaxed">
+                          We've been working in neighborhoods throughout {city} for decades. We know the local housing styles, the common issues with older wiring and plumbing in the area, and we're just a short drive away when you have an emergency.
+                        </p>
+                        <div className="flex gap-4">
+                          <div className="bg-blue-50 text-blue-900 px-4 py-2 rounded-lg font-bold text-sm">Fast Response</div>
+                          <div className="bg-orange-50 text-orange-900 px-4 py-2 rounded-lg font-bold text-sm">Local Experts</div>
+                        </div>
+                     </div>
+                     <div className="bg-slate-100 rounded-2xl h-64 w-full flex items-center justify-center">
+                        {/* Placeholder for Local Image */}
+                        <p className="text-slate-400 font-bold flex flex-col items-center">
+                          <MapPin size={48} className="mb-2" />
+                          Map of {city}
+                        </p>
+                     </div>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-8 mb-16">
+                    <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
+                      <h3 className="font-bold text-xl text-blue-900 mb-6 flex items-center gap-3">
+                        <div className="bg-white p-2 rounded-lg shadow-sm"><Zap size={20} className="text-orange-500" /></div> 
+                        Electrical Services
+                      </h3>
+                      <ul className="space-y-4">
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Panel Upgrades (100 to 200 Amp)</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Recessed Lighting Install</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> Ceiling Fan Installation</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-blue-500 rounded-full"></div> EV Charger Hookups</li>
+                      </ul>
+                    </div>
+                    <div className="bg-slate-50 p-8 rounded-2xl border border-slate-100">
+                      <h3 className="font-bold text-xl text-blue-900 mb-6 flex items-center gap-3">
+                        <div className="bg-white p-2 rounded-lg shadow-sm"><Hammer size={20} className="text-orange-500" /></div> 
+                        Handyman & Remodeling
+                      </h3>
+                      <ul className="space-y-4">
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Bathroom Renovations</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> LVP Flooring Installation</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Drywall Repair & Paint</li>
+                        <li className="flex items-center gap-3 text-slate-700 font-medium"><div className="w-1.5 h-1.5 bg-orange-500 rounded-full"></div> Door & Window Trim</li>
+                      </ul>
+                    </div>
+                  </div>
+                  
+                  {/* Local "Did you know" section - SEO Juice */}
+                  <div className="border-t border-slate-200 pt-12">
+                    <h4 className="font-bold text-lg text-slate-900 mb-4">Common Issues in {city} Homes</h4>
+                    <p className="text-slate-600 text-sm leading-relaxed mb-8">
+                      Many homes in the {city} area built before 1970 still have cloth wiring or outdated fuse boxes. We specialize in bringing these older homes up to modern safety codes without damaging your walls or ceilings.
+                    </p>
+                  </div>
+
+                  <div className="bg-blue-900 rounded-2xl p-8 lg:p-12 text-center text-white relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                    <h3 className="text-3xl font-bold mb-4 relative z-10">Live in {city}?</h3>
+                    <p className="text-blue-100 mb-8 relative z-10">We offer free, no-obligation estimates for all local residents.</p>
+                    <div className="flex flex-col sm:flex-row justify-center gap-4 relative z-10">
+                      <a href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} className="bg-white text-blue-900 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition-colors shadow-lg">
+                        Call {COMPANY_PHONE}
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+        const ContactPage = () => (
+          <div className="animate-in fade-in duration-500 py-20 bg-slate-50 min-h-screen">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-2xl mx-auto mb-16">
+                <h1 className="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">Get a Free Estimate</h1>
+                <p className="text-slate-600 text-xl font-light">
+                  Fill out the form below or give us a call. We usually respond within 24 hours.
+                </p>
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+                {/* Info Card - Edged Up */}
+                <div className="space-y-8">
+                   <div className="bg-slate-950 text-white p-10 rounded-3xl shadow-2xl relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-40 h-40 bg-orange-500/20 rounded-full blur-3xl"></div>
+                      
+                      <h2 className="text-2xl font-bold mb-10 relative z-10">Contact Information</h2>
+                      
+                      <div className="space-y-8 relative z-10">
+                        <div className="flex items-start gap-6 group">
+                          <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors shadow-lg border border-slate-700">
+                            <Phone size={28} className="text-white" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Call Us</p>
+                            <a href={`tel:${COMPANY_PHONE.replace(/\D/g, '')}`} className="text-2xl md:text-3xl font-bold hover:text-orange-400 transition-colors">{COMPANY_PHONE}</a>
+                            <p className="text-slate-400 text-sm mt-2 flex items-center gap-2"><div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div> Available Mon-Sat</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-6 group">
+                          <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors shadow-lg border border-slate-700">
+                            <Mail size={28} className="text-white" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Email Us</p>
+                            <a href={`mailto:${COMPANY_EMAIL}`} className="text-xl font-medium hover:text-orange-400 transition-colors break-all">{COMPANY_EMAIL}</a>
+                          </div>
+                        </div>
+
+                        <div className="flex items-start gap-6 group">
+                          <div className="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center shrink-0 group-hover:bg-orange-500 transition-colors shadow-lg border border-slate-700">
+                            <MapPin size={28} className="text-white" />
+                          </div>
+                          <div>
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-2">Office Location</p>
+                            <p className="text-xl leading-relaxed">2272 Forest Hills Dr,<br/>Harrisburg, PA 17112</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* What Happens Next - New Section */}
+                    <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-lg">
+                       <h3 className="font-bold text-lg text-slate-900 mb-6">What Happens Next?</h3>
+                       <div className="space-y-6">
+                         <div className="flex gap-4">
+                           <div className="flex flex-col items-center">
+                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm">1</div>
+                             <div className="w-0.5 h-full bg-slate-100 my-1"></div>
+                           </div>
+                           <div>
+                             <h4 className="font-bold text-slate-900">We Review</h4>
+                             <p className="text-sm text-slate-500">Sam or Wilson reviews your request.</p>
+                           </div>
+                         </div>
+                         <div className="flex gap-4">
+                           <div className="flex flex-col items-center">
+                             <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-900 flex items-center justify-center font-bold text-sm">2</div>
+                             <div className="w-0.5 h-full bg-slate-100 my-1"></div>
+                           </div>
+                           <div>
+                             <h4 className="font-bold text-slate-900">We Contact</h4>
+                             <p className="text-sm text-slate-500">We call or email to schedule a visit.</p>
+                           </div>
+                         </div>
+                         <div className="flex gap-4">
+                           <div className="flex flex-col items-center">
+                             <div className="w-8 h-8 rounded-full bg-orange-100 text-orange-900 flex items-center justify-center font-bold text-sm">3</div>
+                           </div>
+                           <div>
+                             <h4 className="font-bold text-slate-900">Free Estimate</h4>
+                             <p className="text-sm text-slate-500">You get a clear price. No pressure.</p>
+                           </div>
+                         </div>
+                       </div>
+                    </div>
+                </div>
+
+                {/* Form */}
+                <div className="bg-white p-10 rounded-3xl shadow-2xl border border-slate-100">
+                  <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-700">First Name</label>
+                        <input type="text" className="w-full px-4 py-4 rounded-xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="John" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-bold text-slate-700">Last Name</label>
+                        <input type="text" className="w-full px-4 py-4 rounded-xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="Doe" />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-slate-700">Phone Number</label>
+                      <input type="tel" className="w-full px-4 py-4 rounded-xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 outline-none transition-all bg-slate-50 focus:bg-white" placeholder="(717) 555-0123" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-slate-700">Service Needed</label>
+                      <div className="relative">
+                        <select className="w-full px-4 py-4 rounded-xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 outline-none transition-all bg-slate-50 focus:bg-white appearance-none cursor-pointer">
+                          <option>Electrical Repair / Install</option>
+                          <option>Plumbing</option>
+                          <option>HVAC / AC Repair</option>
+                          <option>Remodeling (Kitchen/Bath)</option>
+                          <option>Flooring</option>
+                          <option>Other Handyman Service</option>
+                        </select>
+                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 rotate-90" size={16} />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="block text-sm font-bold text-slate-700">Project Details</label>
+                      <textarea className="w-full px-4 py-4 rounded-xl border-2 border-slate-100 focus:border-orange-500 focus:ring-0 outline-none transition-all bg-slate-50 focus:bg-white h-40 resize-none" placeholder="Tell us what you need help with..."></textarea>
+                    </div>
+
+                    <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-5 rounded-xl shadow-xl shadow-orange-500/30 transition-all transform hover:-translate-y-1 text-lg">
+                      Send Message
+                    </button>
+                    <p className="text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+                      <ShieldCheck size={12} /> Your information is secure. We never share your data.
+                    </p>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+
+        const GalleryPage = () => (
+          <div className="animate-in fade-in duration-500 py-24 bg-white">
+            <div className="container mx-auto px-4 text-center max-w-3xl mx-auto mb-16">
+              <span className="text-orange-600 font-bold uppercase tracking-wider text-sm mb-2 block">Portfolio</span>
+              <h1 className="text-5xl font-extrabold text-slate-900 mb-6">Our Recent Projects</h1>
+              <p className="text-slate-600 text-xl font-light">
+                Quality workmanship isn't just a promise. It's what we do every single day.
+              </p>
+            </div>
+            
+            <div className="container mx-auto px-4">
+              {/* Filters (Visual only) */}
+              <div className="flex flex-wrap justify-center gap-2 mb-12">
+                 {['All', 'Electrical', 'Plumbing', 'Remodeling'].map((filter, i) => (
+                   <button key={filter} className={`px-6 py-2 rounded-full font-bold text-sm transition-colors ${i === 0 ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}>
+                     {filter}
+                   </button>
+                 ))}
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1,2,3,4,5,6].map((i) => (
+                  <div key={i} className="group relative overflow-hidden rounded-3xl shadow-lg cursor-pointer aspect-[4/3]">
+                    <img 
+                      src={`https://images.unsplash.com/photo-${i === 1 ? '1600585154340-be6161a56a0c' : i === 2 ? '1584622650111-993a426fbf0a' : i === 3 ? '1507652319164-1fdd9080cf74' : '1581094794329-c8112a89af12'}?auto=format&fit=crop&q=80&w=600`} 
+                      alt="Project" 
+                      className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-8">
+                      <span className="text-orange-400 text-xs font-bold uppercase tracking-wider mb-2">Remodeling</span>
+                      <p className="text-white font-bold text-xl">Kitchen Renovation</p>
+                      <p className="text-slate-300 text-sm">Harrisburg, PA</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+
+        // --- Main App Component ---
+
+        const App = () => {
+          const [activePage, setActivePage] = useState('home');
+          const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+          useEffect(() => {
+            window.scrollTo(0, 0);
+          }, [activePage]);
+
+          // Router Switch
+          const renderPage = () => {
+            switch(activePage) {
+              case 'home': return <HomePage setPage={setActivePage} />;
+              case 'service-electrical': return <ServicePage title="Electrical" icon={Zap} desc={SERVICES[0].longDesc} features={['Recessed Lighting', 'Panel Upgrades', 'Ceiling Fans', 'Safety Inspections', 'Emergency Repair']} image="https://images.unsplash.com/photo-1621905251918-48416bd8575a?auto=format&fit=crop&q=80&w=1200" />;
+              case 'service-plumbing': return <ServicePage title="Plumbing" icon={Droplets} desc={SERVICES[1].longDesc} features={['Leak Detection', 'Water Heater Install', 'Pipe Repair', 'Fixture Installation', 'Drain Cleaning']} image="https://images.unsplash.com/photo-1585704032915-c3400ca199e7?auto=format&fit=crop&q=80&w=1200" />;
+              case 'service-hvac': return <ServicePage title="HVAC & AC" icon={Thermometer} desc={SERVICES[2].longDesc} features={['AC Repair', 'Furnace Maintenance', 'Thermostat Install', 'Filter Replacement', 'System Tune-ups']} image="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80&w=1200" />;
+              case 'service-remodeling': return <ServicePage title="Remodeling" icon={Hammer} desc={SERVICES[3].longDesc} features={['Kitchen Renovation', 'Bathroom Remodel', 'Basement Finishing', 'Flooring Install', 'Painting']} image="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?auto=format&fit=crop&q=80&w=1200" />;
+              case 'loc-harrisburg': return <LocationPage city="Harrisburg" subtext="Your local capital region experts." />;
+              case 'loc-mechanicsburg': return <LocationPage city="Mechanicsburg" subtext="Serving the entire West Shore with pride." />;
+              case 'loc-hershey': return <LocationPage city="Hershey" subtext="Quality service for the sweetest place on earth." />;
+              case 'contact': return <ContactPage />;
+              case 'gallery': return <GalleryPage />;
+              default: return <HomePage setPage={setActivePage} />;
+            }
+          }
+
+          return (
+            <div className="font-sans text-slate-900 bg-white min-h-screen flex flex-col selection:bg-orange-100 selection:text-orange-900">
+              <Navigation activePage={activePage} setPage={setActivePage} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+              
+              <main className="flex-grow">
+                {renderPage()}
+              </main>
+
+              <Footer setPage={setActivePage} />
+              <StickyMobileCTA />
+            </div>
+          );
+        };
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
